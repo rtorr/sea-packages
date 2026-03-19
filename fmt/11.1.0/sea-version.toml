@@ -1,0 +1,11 @@
+[package]
+  name = "fmt"
+  version = "11.1.0"
+  kind = "source"
+
+[[artifacts]]
+  channel = "stable"
+  abi_tag = "darwin-aarch64-gcc16-libcxx"
+  status = "published"
+  sha256 = "7dbcdf629b4bf4916e7990353574d3c3d778f5c9acee99815c4b185178b924b0"
+  timestamp = "2026-03-19T19:34:37Z"
