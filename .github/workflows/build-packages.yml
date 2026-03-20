@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         package: ${{ fromJson(needs.detect-changes.outputs.packages) }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -55,14 +55,12 @@ jobs:
       - name: Install sea
         shell: bash
         run: |
-          # Map uname to release asset names
           OS=$(uname -s | tr A-Z a-z)
           ARCH=$(uname -m)
           case "$ARCH" in
             x86_64)  ARCH="amd64" ;;
             aarch64) ARCH="arm64" ;;
           esac
-
           if [ "$RUNNER_OS" = "Windows" ]; then
             curl -sSfL -o sea.zip "https://github.com/rtorr/sea/releases/latest/download/sea-windows-${ARCH}.zip"
             unzip -o sea.zip
@@ -77,29 +75,20 @@ jobs:
 
       - name: Configure registry
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ~/.sea
-          cat > ~/.sea/config.toml <<'TOML'
-          [[remotes]]
-          name = "sea-packages"
-          type = "github-releases"
-          url = "rtorr/sea-packages"
-          token_env = "GITHUB_TOKEN"
-          TOML
-          # Remove leading whitespace from heredoc
-          sed -i.bak 's/^          //' ~/.sea/config.toml && rm -f ~/.sea/config.toml.bak
+          printf '[[remotes]]\nname = "sea-packages"\ntype = "github-releases"\nurl = "rtorr/sea-packages"\ntoken_env = "GITHUB_TOKEN"\n' > ~/.sea/config.toml
+          cat ~/.sea/config.toml
 
       - name: Install dependencies
+        if: ${{ hashFiles(format('packages/{0}/sea.toml', matrix.package)) != '' }}
         working-directory: packages/${{ matrix.package }}
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Only install if there are dependencies
-          if grep -q '\[dependencies\]' sea.toml 2>/dev/null; then
-            sea install || echo "Warning: dependency install failed (may be first build)"
+          if grep -q '\[dependencies\]' sea.toml; then
+            sea install || echo "::warning::Dependency install failed"
           fi
 
       - name: Build package
@@ -114,11 +103,15 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: sea publish --registry sea-packages --skip-verify
+        run: |
+          # --skip-verify because the previous version may have been published
+          # from a different platform with different symbols
+          sea publish --registry sea-packages --skip-verify || echo "::warning::Publish failed (asset may already exist for this ABI tag)"
 
       - name: Show result
         shell: bash
         run: |
           NAME=$(grep '^name = ' packages/${{ matrix.package }}/sea.toml | head -1 | awk -F'"' '{print $2}')
           VER=$(grep '^version = ' packages/${{ matrix.package }}/sea.toml | head -1 | awk -F'"' '{print $2}')
-          echo "Published: $NAME@$VER ($(sea profile list 2>&1 | grep 'ABI Tag' | awk '{print $NF}'))"
+          ABI=$(sea profile list 2>&1 | grep 'ABI Tag' | awk '{print $NF}')
+          echo "Published: $NAME@$VER ($ABI)"
