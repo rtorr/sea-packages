@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package to build (empty = all changed)"
+        description: "Package to build (e.g. cjson/1.8.0, empty = all changed)"
         required: false
         type: string
 
@@ -26,14 +26,9 @@ jobs:
       - id: detect
         run: |
           if [ -n "${{ inputs.package }}" ]; then
-            # Manual trigger with specific package
-            PKG="${{ inputs.package }}"
-            # Find the version directory
-            VER=$(ls packages/$PKG/ | head -1)
-            echo "packages=[\"$PKG/$VER\"]" >> $GITHUB_OUTPUT
+            echo "packages=[\"${{ inputs.package }}\"]" >> $GITHUB_OUTPUT
           else
-            # Detect changed packages from git diff
-            CHANGED=$(git diff --name-only HEAD~1 -- packages/ | cut -d/ -f2,3 | sort -u | while read pkg; do
+            CHANGED=$(git diff --name-only HEAD~1 -- packages/ 2>/dev/null | cut -d/ -f2,3 | sort -u | while read pkg; do
               if [ -f "packages/$pkg/sea.toml" ]; then
                 echo "\"$pkg\""
               fi
@@ -44,7 +39,6 @@ jobs:
               echo "packages=[$CHANGED]" >> $GITHUB_OUTPUT
             fi
           fi
-          echo "Packages to build: $(cat $GITHUB_OUTPUT)"
 
   build:
     needs: detect-changes
@@ -59,58 +53,72 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install sea
+        shell: bash
         run: |
+          # Map uname to release asset names
+          OS=$(uname -s | tr A-Z a-z)
+          ARCH=$(uname -m)
+          case "$ARCH" in
+            x86_64)  ARCH="amd64" ;;
+            aarch64) ARCH="arm64" ;;
+          esac
+
           if [ "$RUNNER_OS" = "Windows" ]; then
-            curl -sSL -o sea.zip https://github.com/rtorr/sea/releases/latest/download/sea-windows-amd64.zip
-            unzip sea.zip
-            mv sea.exe /usr/local/bin/ 2>/dev/null || mv sea.exe $HOME/sea.exe
-            echo "$HOME" >> $GITHUB_PATH
+            curl -sSfL -o sea.zip "https://github.com/rtorr/sea/releases/latest/download/sea-windows-${ARCH}.zip"
+            unzip -o sea.zip
+            mkdir -p "$HOME/bin"
+            mv sea.exe "$HOME/bin/"
+            echo "$HOME/bin" >> $GITHUB_PATH
           else
-            curl -sSL https://github.com/rtorr/sea/releases/latest/download/sea-$(uname -s | tr A-Z a-z)-$(uname -m).tar.gz | tar xz
+            curl -sSfL "https://github.com/rtorr/sea/releases/latest/download/sea-${OS}-${ARCH}.tar.gz" | tar xz
             sudo mv sea /usr/local/bin/
           fi
           sea version
-        shell: bash
 
       - name: Configure registry
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ~/.sea
-          cat > ~/.sea/config.toml << EOF
+          cat > ~/.sea/config.toml <<'TOML'
           [[remotes]]
           name = "sea-packages"
           type = "github-releases"
           url = "rtorr/sea-packages"
           token_env = "GITHUB_TOKEN"
-          EOF
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOML
+          # Remove leading whitespace from heredoc
+          sed -i.bak 's/^          //' ~/.sea/config.toml && rm -f ~/.sea/config.toml.bak
 
       - name: Install dependencies
         working-directory: packages/${{ matrix.package }}
-        run: sea install || true
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only install if there are dependencies
+          if grep -q '\[dependencies\]' sea.toml 2>/dev/null; then
+            sea install || echo "Warning: dependency install failed (may be first build)"
+          fi
 
       - name: Build package
         working-directory: packages/${{ matrix.package }}
-        run: sea build
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sea build
 
       - name: Publish package
         working-directory: packages/${{ matrix.package }}
-        run: sea publish --registry sea-packages --skip-verify
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sea publish --registry sea-packages --skip-verify
 
-      - name: Show published info
+      - name: Show result
+        shell: bash
         run: |
           NAME=$(grep '^name = ' packages/${{ matrix.package }}/sea.toml | head -1 | awk -F'"' '{print $2}')
           VER=$(grep '^version = ' packages/${{ matrix.package }}/sea.toml | head -1 | awk -F'"' '{print $2}')
-          sea profile list 2>&1 | grep "ABI Tag"
-          echo "Published: $NAME@$VER"
-        shell: bash
+          echo "Published: $NAME@$VER ($(sea profile list 2>&1 | grep 'ABI Tag' | awk '{print $NF}'))"
