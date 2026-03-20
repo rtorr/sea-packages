@@ -4,8 +4,8 @@ version = "1.87.0"
 kind = "header-only"
 description = "Boost C++ Libraries — header-only"
 
-[build]
-script = "build.sh"
+[build.source]
+url = "https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-b2-nodocs.tar.gz"
 
 [publish]
 registry = "sea-packages"
