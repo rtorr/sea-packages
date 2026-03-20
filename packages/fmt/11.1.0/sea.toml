@@ -12,4 +12,4 @@ url = "https://github.com/fmtlib/fmt/archive/refs/tags/11.1.4.tar.gz"
 
 [publish]
 registry = "sea-packages"
-include = ["include/**", "lib/**"]
+include = ["include/**", "lib/**", "bin/**", "share/**"]
