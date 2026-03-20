@@ -1,1 +1,8 @@
+_src/
+sea_build/
+sea_build_packages/
+sea_packages/
+*.tar.zst
 *.lock
+.sea-linking
+.DS_Store

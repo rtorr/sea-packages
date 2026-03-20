@@ -1,0 +1,12 @@
+[package]
+name = "boost-headers"
+version = "1.87.0"
+kind = "header-only"
+description = "Boost C++ Libraries — header-only"
+
+[build]
+script = "build.sh"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**"]
