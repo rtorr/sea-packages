@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdouble-conversion.a "CMakeFiles/double-conversion.dir/bignum.cc.o" "CMakeFiles/double-conversion.dir/bignum-dtoa.cc.o" "CMakeFiles/double-conversion.dir/cached-powers.cc.o" "CMakeFiles/double-conversion.dir/diy-fp.cc.o" "CMakeFiles/double-conversion.dir/double-conversion.cc.o" "CMakeFiles/double-conversion.dir/fast-dtoa.cc.o" "CMakeFiles/double-conversion.dir/fixed-dtoa.cc.o" "CMakeFiles/double-conversion.dir/strtod.cc.o"
+/usr/bin/ranlib libdouble-conversion.a

@@ -1,0 +1,11 @@
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/libsnappy.1.2.1.dylib
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/libsnappy.1.dylib
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/libsnappy.dylib
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/include/snappy-c.h
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/include/snappy-sinksource.h
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/include/snappy.h
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/include/snappy-stubs-public.h
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/cmake/Snappy/SnappyTargets.cmake
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/cmake/Snappy/SnappyTargets-release.cmake
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/cmake/Snappy/SnappyConfig.cmake
+/Users/rtorr/personal/sea-packages/packages/snappy/1.2.0/sea_build/test/lib/cmake/Snappy/SnappyConfigVersion.cmake

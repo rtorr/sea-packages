@@ -9,14 +9,8 @@ cmake --build . --config Release -j4
 mkdir -p "$SEA_INSTALL_DIR/include/double-conversion" "$SEA_INSTALL_DIR/lib"
 cp "$SRCDIR/src/"*.h "$SEA_INSTALL_DIR/include/double-conversion/"
 
-# Copy library — handle platform differences
-for dir in . Release lib; do
-    for ext in a lib dylib so; do
-        for f in "$dir/"*double*."$ext" "$dir/"*double*."$ext"; do
-            if [ -f "$f" ]; then
-                cp "$f" "$SEA_INSTALL_DIR/lib/"
-            fi
-        done
-    done
+# Copy library — search all subdirectories
+find . -name "libdouble-conversion.*" -o -name "double-conversion.lib" | while read f; do
+    cp "$f" "$SEA_INSTALL_DIR/lib/"
 done
 echo "double-conversion 1.1.6 built"
