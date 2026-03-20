@@ -3,9 +3,14 @@ set -e
 VERSION="1.10.0"
 SRCDIR="$SEA_PROJECT_DIR/_src"
 
+CURL="curl"
+if [ -f "/c/Windows/System32/curl.exe" ]; then
+    CURL="/c/Windows/System32/curl.exe"
+fi
+
 if [ ! -d "$SRCDIR/lz4-${VERSION}" ]; then
     mkdir -p "$SRCDIR"
-    curl -fSL --retry 3 --connect-timeout 30 \
+    $CURL -fSL --retry 3 --connect-timeout 30 \
         -o "$SRCDIR/lz4.tar.gz" \
         "https://github.com/lz4/lz4/archive/refs/tags/v${VERSION}.tar.gz"
     tar xzf "$SRCDIR/lz4.tar.gz" -C "$SRCDIR"

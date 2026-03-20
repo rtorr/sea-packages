@@ -3,10 +3,15 @@ set -e
 VERSION="1.7.17"
 SRCDIR="$SEA_PROJECT_DIR/_src"
 
+# Use Windows system curl if available (Git Bash curl has SSL issues)
+CURL="curl"
+if [ -f "/c/Windows/System32/curl.exe" ]; then
+    CURL="/c/Windows/System32/curl.exe"
+fi
+
 if [ ! -d "$SRCDIR/cJSON-${VERSION}" ]; then
     mkdir -p "$SRCDIR"
-    # Use curl with explicit retry and timeout
-    curl -fSL --retry 3 --connect-timeout 30 \
+    $CURL -fSL --retry 3 --connect-timeout 30 \
         -o "$SRCDIR/cjson.tar.gz" \
         "https://github.com/DaveGamble/cJSON/archive/refs/tags/v${VERSION}.tar.gz"
     tar xzf "$SRCDIR/cjson.tar.gz" -C "$SRCDIR"
