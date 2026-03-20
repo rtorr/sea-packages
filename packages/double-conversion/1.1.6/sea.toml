@@ -3,9 +3,12 @@ name = "double-conversion"
 version = "1.1.6"
 kind = "source"
 
+[build]
+script = "build.sh"
+
 [build.source]
 url = "https://github.com/google/double-conversion/archive/refs/tags/v1.1.6.tar.gz"
 
 [publish]
 registry = "sea-packages"
-include = ["include/**", "lib/**", "bin/**", "share/**"]
+include = ["include/**", "lib/**"]

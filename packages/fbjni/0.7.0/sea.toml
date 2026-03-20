@@ -4,7 +4,7 @@ version = "0.7.0"
 kind = "source"
 
 [build]
-cmake_args = ["-DFBJNI_SKIP_TESTS=ON"]
+script = "build.sh"
 
 [build.source]
 url = "https://github.com/facebookincubator/fbjni/archive/refs/tags/v0.7.0.tar.gz"
