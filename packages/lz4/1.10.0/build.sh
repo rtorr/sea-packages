@@ -13,15 +13,15 @@ cd "$SRCDIR/lz4-${VERSION}"
 
 # Use CMake (works on Linux, macOS, and Windows)
 mkdir -p _build && cd _build
-cmake ../build/cmake \
-    -DCMAKE_INSTALL_PREFIX="$SEA_INSTALL_DIR" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER="${CC:-cc}" \
-    -DBUILD_SHARED_LIBS=ON \
-    -DBUILD_STATIC_LIBS=ON \
-    -DLZ4_BUILD_CLI=OFF \
-    -DLZ4_BUILD_LEGACY_LZ4C=OFF \
-    2>&1
+
+CMAKE_ARGS="-DCMAKE_INSTALL_PREFIX=$SEA_INSTALL_DIR -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON -DLZ4_BUILD_CLI=OFF -DLZ4_BUILD_LEGACY_LZ4C=OFF"
+
+# Only set compiler if CC is explicitly set (let CMake auto-detect on Windows/MSVC)
+if [ -n "$CC" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_COMPILER=$CC"
+fi
+
+cmake ../build/cmake $CMAKE_ARGS 2>&1
 cmake --build . --config Release -j4 2>&1
 cmake --install . --config Release 2>&1
 echo "lz4 ${VERSION} built"

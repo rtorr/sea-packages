@@ -11,15 +11,14 @@ fi
 
 cd "$SRCDIR/cJSON-${VERSION}"
 
-# Use CMake (works on Linux, macOS, and Windows)
 mkdir -p _build && cd _build
-cmake .. \
-    -DCMAKE_INSTALL_PREFIX="$SEA_INSTALL_DIR" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER="${CC:-cc}" \
-    -DBUILD_SHARED_LIBS=ON \
-    -DENABLE_CJSON_TEST=OFF \
-    2>&1
+
+CMAKE_ARGS="-DCMAKE_INSTALL_PREFIX=$SEA_INSTALL_DIR -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DENABLE_CJSON_TEST=OFF"
+if [ -n "$CC" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_COMPILER=$CC"
+fi
+
+cmake .. $CMAKE_ARGS 2>&1
 cmake --build . --config Release -j4 2>&1
 cmake --install . --config Release 2>&1
 echo "cJSON ${VERSION} built"
