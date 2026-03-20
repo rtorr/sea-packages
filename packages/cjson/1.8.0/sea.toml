@@ -2,11 +2,11 @@
 name = "cjson"
 version = "1.8.0"
 kind = "source"
-description = "Ultralightweight JSON parser in ANSI C — with sea extensions"
+description = "Ultralightweight JSON parser in ANSI C"
 
 [build]
 script = "build.sh"
 
 [publish]
-registry = "test-local"
+registry = "sea-packages"
 include = ["include/**", "lib/**"]

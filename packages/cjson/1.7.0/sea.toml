@@ -6,8 +6,7 @@ description = "Ultralightweight JSON parser in ANSI C"
 
 [build]
 script = "build.sh"
-test = "test/verify.c"
 
 [publish]
-registry = "test-local"
+registry = "sea-packages"
 include = ["include/**", "lib/**"]
