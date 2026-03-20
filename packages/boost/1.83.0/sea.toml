@@ -1,0 +1,15 @@
+[package]
+name = "boost"
+version = "1.83.0"
+kind = "source"
+description = "Boost C++ Libraries (compiled)"
+
+[build]
+script = "build.sh"
+
+[build.source]
+url = "https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**", "lib/**", "bin/**", "share/**"]
