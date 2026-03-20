@@ -91,6 +91,21 @@ jobs:
             sea install || echo "::warning::Dependency install failed"
           fi
 
+      - name: Set up SSL for Git Bash curl (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Git Bash's curl may have outdated CA certs. Point it at the system store.
+          $caBundle = "C:\Program Files\Git\mingw64\etc\ssl\certs\ca-bundle.crt"
+          if (Test-Path $caBundle) {
+            echo "CURL_CA_BUNDLE=$caBundle" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+          # Also ensure curl from system PATH is used (not Git Bash's)
+          $systemCurl = (Get-Command curl.exe -ErrorAction SilentlyContinue).Source
+          if ($systemCurl) {
+            echo "Using system curl: $systemCurl"
+          }
+
       - name: Build package
         working-directory: packages/${{ matrix.package }}
         shell: bash
