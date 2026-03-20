@@ -1,0 +1,11 @@
+[package]
+name = "boost-headers"
+version = "1.83.0"
+kind = "header-only"
+
+[build.source]
+url = "https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**"]

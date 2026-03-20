@@ -1,0 +1,14 @@
+[package]
+name = "fmt"
+version = "11.0.2"
+kind = "source"
+
+[build]
+cmake_args = ["-DFMT_DOC=OFF", "-DFMT_TEST=OFF"]
+
+[build.source]
+url = "https://github.com/fmtlib/fmt/archive/refs/tags/11.0.2.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**", "lib/**", "bin/**", "share/**"]

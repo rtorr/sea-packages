@@ -1,0 +1,11 @@
+[package]
+name = "fast-float"
+version = "8.0.0"
+kind = "header-only"
+
+[build.source]
+url = "https://github.com/fastfloat/fast_float/archive/refs/tags/v8.0.0.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**"]

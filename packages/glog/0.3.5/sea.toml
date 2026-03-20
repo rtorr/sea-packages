@@ -1,0 +1,17 @@
+[package]
+name = "glog"
+version = "0.3.5"
+kind = "source"
+
+[dependencies]
+gflags = { version = "^2.2.0" }
+
+[build]
+cmake_args = ["-DBUILD_TESTING=OFF", "-DWITH_GTEST=OFF"]
+
+[build.source]
+url = "https://github.com/google/glog/archive/refs/tags/v0.3.5.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**", "lib/**", "bin/**", "share/**"]
