@@ -6,11 +6,17 @@ BOOST_VERSION_UNDERSCORE="1_87_0"
 SRC_DIR="$SEA_PROJECT_DIR/_src"
 ARCHIVE="$SRC_DIR/boost_${BOOST_VERSION_UNDERSCORE}.tar.gz"
 
+# Use Windows system curl if available (Git Bash curl has SSL issues)
+CURL="curl"
+if [ -f "/c/Windows/System32/curl.exe" ]; then
+    CURL="/c/Windows/System32/curl.exe"
+fi
+
 mkdir -p "$SRC_DIR"
 
 if [ ! -f "$ARCHIVE" ]; then
     echo "Downloading Boost ${BOOST_VERSION}..."
-    curl -L -o "$ARCHIVE" \
+    $CURL -L -o "$ARCHIVE" \
         "https://github.com/boostorg/boost/releases/download/boost-${BOOST_VERSION}/boost-${BOOST_VERSION}-b2-nodocs.tar.gz"
 fi
 

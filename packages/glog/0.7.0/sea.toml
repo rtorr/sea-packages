@@ -7,7 +7,10 @@ kind = "source"
 gflags = { version = "^2.2.0" }
 
 [build]
-script = "build.sh"
+cmake_args = ["-DCMAKE_CXX_STANDARD=17", "-DBUILD_TESTING=OFF", "-DWITH_GTEST=OFF"]
+
+[build.source]
+url = "https://github.com/google/glog/archive/refs/tags/v0.7.1.tar.gz"
 
 [publish]
 registry = "sea-packages"

@@ -4,9 +4,16 @@ set -e
 VERSION="3450300"
 YEAR="2024"
 SRCDIR="$SEA_PROJECT_DIR/_src"
+
+# Use Windows system curl if available (Git Bash curl has SSL issues)
+CURL="curl"
+if [ -f "/c/Windows/System32/curl.exe" ]; then
+    CURL="/c/Windows/System32/curl.exe"
+fi
+
 if [ ! -d "$SRCDIR/sqlite-amalgamation-${VERSION}" ]; then
     mkdir -p "$SRCDIR"
-    curl -sL "https://www.sqlite.org/${YEAR}/sqlite-amalgamation-${VERSION}.zip" \
+    $CURL -sL "https://www.sqlite.org/${YEAR}/sqlite-amalgamation-${VERSION}.zip" \
         -o "$SRCDIR/sqlite.zip"
     cd "$SRCDIR" && unzip -qo sqlite.zip
 fi

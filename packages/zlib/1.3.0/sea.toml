@@ -6,7 +6,9 @@ description = "A massively spiffy yet delicately unobtrusive compression library
 license = "Zlib"
 
 [build]
-script = "build.sh"
+
+[build.source]
+url = "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
 
 [publish]
 registry = "sea-packages"

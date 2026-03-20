@@ -5,7 +5,10 @@ kind = "source"
 description = "Ultralightweight JSON parser in ANSI C"
 
 [build]
-script = "build.sh"
+cmake_args = ["-DENABLE_CJSON_TEST=OFF"]
+
+[build.source]
+url = "https://github.com/DaveGamble/cJSON/archive/refs/tags/v1.7.17.tar.gz"
 
 [publish]
 registry = "sea-packages"

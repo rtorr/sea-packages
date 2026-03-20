@@ -3,9 +3,12 @@ name = "libevent"
 version = "2.1.0"
 kind = "source"
 
+[build]
+cmake_args = ["-DEVENT__DISABLE_TESTS=ON"]
+
+[build.source]
+url = "https://github.com/libevent/libevent/archive/refs/tags/release-2.1.12-stable.tar.gz"
+
 [publish]
 registry = "sea-packages"
 include = ["include/**", "lib/**", "bin/**", "share/**", "LICENSE", "COPYING"]
-
-[build]
-script = "build.sh"

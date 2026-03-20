@@ -3,9 +3,11 @@ name = "gflags"
 version = "2.2.0"
 kind = "source"
 
+[build]
+
+[build.source]
+url = "https://github.com/gflags/gflags/archive/refs/tags/v2.2.2.tar.gz"
+
 [publish]
 registry = "sea-packages"
 include = ["include/**", "lib/**", "bin/**", "share/**", "LICENSE", "COPYING"]
-
-[build]
-script = "build.sh"

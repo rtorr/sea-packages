@@ -6,7 +6,11 @@ description = "Extremely fast non-cryptographic hash algorithm"
 license = "BSD-2-Clause"
 
 [build]
-script = "build.sh"
+cmake_args = ["-DXXHASH_BUILD_XXHSUM=OFF"]
+subdir = "cmake_unofficial"
+
+[build.source]
+url = "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.3.tar.gz"
 
 [publish]
 registry = "sea-packages"
