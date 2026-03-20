@@ -10,11 +10,16 @@ if [ ! -d "$SRCDIR/cJSON-${VERSION}" ]; then
 fi
 
 cd "$SRCDIR/cJSON-${VERSION}"
-mkdir -p "$SEA_INSTALL_DIR/include/cjson" "$SEA_INSTALL_DIR/lib"
 
-${CC:-cc} -c -O2 -fPIC cJSON.c -o cJSON.o
-${CC:-cc} -dynamiclib -o "$SEA_INSTALL_DIR/lib/libcjson.dylib" cJSON.o 2>/dev/null || \
-${CC:-cc} -shared -o "$SEA_INSTALL_DIR/lib/libcjson.so" cJSON.o 2>/dev/null
-ar rcs "$SEA_INSTALL_DIR/lib/libcjson.a" cJSON.o
-cp cJSON.h "$SEA_INSTALL_DIR/include/cjson/"
+# Use CMake (works on Linux, macOS, and Windows)
+mkdir -p _build && cd _build
+cmake .. \
+    -DCMAKE_INSTALL_PREFIX="$SEA_INSTALL_DIR" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER="${CC:-cc}" \
+    -DBUILD_SHARED_LIBS=ON \
+    -DENABLE_CJSON_TEST=OFF \
+    2>&1
+cmake --build . --config Release -j4 2>&1
+cmake --install . --config Release 2>&1
 echo "cJSON ${VERSION} built"
