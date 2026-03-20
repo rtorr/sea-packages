@@ -5,8 +5,12 @@ kind = "source"
 description = "Extremely fast compression algorithm"
 
 [build]
-script = "build.sh"
+subdir = "build/cmake"
+cmake_args = ["-DBUILD_STATIC_LIBS=ON", "-DLZ4_BUILD_CLI=OFF", "-DLZ4_BUILD_LEGACY_LZ4C=OFF"]
+
+[build.source]
+url = "https://github.com/lz4/lz4/archive/refs/tags/v1.10.0.tar.gz"
 
 [publish]
-registry = "test-local"
+registry = "sea-packages"
 include = ["include/**", "lib/**"]
