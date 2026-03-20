@@ -1,0 +1,116 @@
+name: Build and Publish Packages
+
+on:
+  push:
+    branches: [main]
+    paths: ["packages/**"]
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to build (empty = all changed)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.detect.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: detect
+        run: |
+          if [ -n "${{ inputs.package }}" ]; then
+            # Manual trigger with specific package
+            PKG="${{ inputs.package }}"
+            # Find the version directory
+            VER=$(ls packages/$PKG/ | head -1)
+            echo "packages=[\"$PKG/$VER\"]" >> $GITHUB_OUTPUT
+          else
+            # Detect changed packages from git diff
+            CHANGED=$(git diff --name-only HEAD~1 -- packages/ | cut -d/ -f2,3 | sort -u | while read pkg; do
+              if [ -f "packages/$pkg/sea.toml" ]; then
+                echo "\"$pkg\""
+              fi
+            done | paste -sd,)
+            if [ -z "$CHANGED" ]; then
+              echo "packages=[]" >> $GITHUB_OUTPUT
+            else
+              echo "packages=[$CHANGED]" >> $GITHUB_OUTPUT
+            fi
+          fi
+          echo "Packages to build: $(cat $GITHUB_OUTPUT)"
+
+  build:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.packages != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
+        package: ${{ fromJson(needs.detect-changes.outputs.packages) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install sea
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            curl -sSL -o sea.zip https://github.com/rtorr/sea/releases/latest/download/sea-windows-amd64.zip
+            unzip sea.zip
+            mv sea.exe /usr/local/bin/ 2>/dev/null || mv sea.exe $HOME/sea.exe
+            echo "$HOME" >> $GITHUB_PATH
+          else
+            curl -sSL https://github.com/rtorr/sea/releases/latest/download/sea-$(uname -s | tr A-Z a-z)-$(uname -m).tar.gz | tar xz
+            sudo mv sea /usr/local/bin/
+          fi
+          sea version
+        shell: bash
+
+      - name: Configure registry
+        run: |
+          mkdir -p ~/.sea
+          cat > ~/.sea/config.toml << EOF
+          [[remotes]]
+          name = "sea-packages"
+          type = "github-releases"
+          url = "rtorr/sea-packages"
+          token_env = "GITHUB_TOKEN"
+          EOF
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        working-directory: packages/${{ matrix.package }}
+        run: sea install || true
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build package
+        working-directory: packages/${{ matrix.package }}
+        run: sea build
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package
+        working-directory: packages/${{ matrix.package }}
+        run: sea publish --registry sea-packages --skip-verify
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show published info
+        run: |
+          NAME=$(grep '^name = ' packages/${{ matrix.package }}/sea.toml | head -1 | awk -F'"' '{print $2}')
+          VER=$(grep '^version = ' packages/${{ matrix.package }}/sea.toml | head -1 | awk -F'"' '{print $2}')
+          sea profile list 2>&1 | grep "ABI Tag"
+          echo "Published: $NAME@$VER"
+        shell: bash
