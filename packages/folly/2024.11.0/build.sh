@@ -7,8 +7,8 @@ for dep in "$SEA_PACKAGES_DIR"/*/; do
     [ -d "$dep" ] && PREFIX_PATH="${PREFIX_PATH:+$PREFIX_PATH;}$dep"
 done
 
-# Find sea's libevent library (named libevent-2.1.7.dylib, not libevent.dylib)
-LIBEVENT_LIB=$(find "$SEA_PACKAGES_DIR/libevent/lib" -name "libevent-2*.dylib" -o -name "libevent.so*" 2>/dev/null | head -1)
+# Find sea's libevent library (named libevent-2.1.7.dylib/.so, not libevent.dylib)
+LIBEVENT_LIB=$(find "$SEA_PACKAGES_DIR/libevent/lib" -name "libevent-2*.dylib" -o -name "libevent.so*" -o -name "libevent.a" -o -name "libevent*.lib" 2>/dev/null | head -1)
 LIBEVENT_INC="$SEA_PACKAGES_DIR/libevent/include"
 
 CMAKE_EXTRA=""
