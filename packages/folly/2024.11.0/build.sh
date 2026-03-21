@@ -25,15 +25,19 @@ fi
 
 mkdir -p "$SEA_PROJECT_DIR/_fbuild" && cd "$SEA_PROJECT_DIR/_fbuild"
 
-# On Windows, force Ninja generator to avoid multi-config issues with
-# Visual Studio generator (folly's pkg-config generation breaks with it).
-CMAKE_GEN=""
+# Windows: use VS generator with MSVC.
+CMAKE_PLATFORM=""
 if [ "$SEA_OS" = "windows" ] || [ -n "$WINDIR" ]; then
-    CMAKE_GEN="-G Ninja"
+    CMAKE_PLATFORM="-A x64 -DBoost_COMPILER=-vc143"
+    # Patch: folly's file(GENERATE) for libfolly.pc breaks with multi-config
+    # generators. Comment out the pkgconfig install to avoid cmake errors.
+    sed -i.bak '/libfolly\.pc/d' "$SRCDIR/CMakeLists.txt"
+    sed -i.bak '/gen_pkgconfig_vars/d' "$SRCDIR/CMakeLists.txt"
+    sed -i.bak '/pkgconfig/d' "$SRCDIR/CMakeLists.txt"
 fi
 
 cmake "$SRCDIR" \
-    $CMAKE_GEN \
+    $CMAKE_PLATFORM \
     -DCMAKE_INSTALL_PREFIX="$SEA_INSTALL_DIR" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=ON \
