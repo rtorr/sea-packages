@@ -1,0 +1,17 @@
+[package]
+name = "hermes"
+version = "250829098.0.1"
+kind = "source"
+description = "Hermes JavaScript engine V1 (from main, matches RN rn-pal branch)"
+
+[build]
+script = "build.sh"
+cmake_args = ["-DHERMES_BUILD_APPLE_FRAMEWORK=OFF", "-DHERMES_ENABLE_TEST_SUITE=OFF", "-DCMAKE_CXX_STANDARD=17"]
+
+[build.source]
+url = "https://github.com/facebook/hermes/archive/refs/heads/main.tar.gz"
+commit = "72c91c3b365f18d3917b75c5f15e978ff95cbb52"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**", "lib/**", "bin/**", "share/**"]

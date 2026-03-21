@@ -73,6 +73,14 @@ jobs:
           fi
           sea version
 
+      - name: Cache sea packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sea/cache
+          key: sea-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(format('packages/{0}/sea.toml', matrix.package)) }}
+          restore-keys: |
+            sea-${{ runner.os }}-${{ runner.arch }}-
+
       - name: Configure registry
         shell: bash
         run: |
