@@ -56,6 +56,9 @@ jobs:
       - name: Install sea
         shell: bash
         run: |
+          # Resolve the latest release tag explicitly to avoid CDN caching issues
+          SEA_VERSION=$(curl -sSf https://api.github.com/repos/rtorr/sea/releases/latest | grep '"tag_name"' | head -1 | cut -d'"' -f4)
+          echo "Installing sea $SEA_VERSION"
           OS=$(uname -s | tr A-Z a-z)
           ARCH=$(uname -m)
           case "$ARCH" in
@@ -63,13 +66,13 @@ jobs:
             aarch64) ARCH="arm64" ;;
           esac
           if [ "$RUNNER_OS" = "Windows" ]; then
-            curl -sSfL -o sea.zip "https://github.com/rtorr/sea/releases/latest/download/sea-windows-${ARCH}.zip"
+            curl -sSfL -o sea.zip "https://github.com/rtorr/sea/releases/download/${SEA_VERSION}/sea-windows-${ARCH}.zip"
             unzip -o sea.zip
             mkdir -p "$HOME/bin"
             mv sea.exe "$HOME/bin/"
             echo "$HOME/bin" >> $GITHUB_PATH
           else
-            curl -sSfL "https://github.com/rtorr/sea/releases/latest/download/sea-${OS}-${ARCH}.tar.gz" | tar xz
+            curl -sSfL "https://github.com/rtorr/sea/releases/download/${SEA_VERSION}/sea-${OS}-${ARCH}.tar.gz" | tar xz
             sudo mv sea /usr/local/bin/
           fi
           sea version
