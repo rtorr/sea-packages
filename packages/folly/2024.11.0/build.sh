@@ -7,8 +7,15 @@ for dep in "$SEA_PACKAGES_DIR"/*/; do
     [ -d "$dep" ] && PREFIX_PATH="${PREFIX_PATH:+$PREFIX_PATH;}$dep"
 done
 
-# Find sea's libevent library (named libevent-2.1.7.dylib/.so, not libevent.dylib)
-LIBEVENT_LIB=$(find "$SEA_PACKAGES_DIR/libevent/lib" -name "libevent-2*.dylib" -o -name "libevent.so*" -o -name "libevent.a" -o -name "libevent*.lib" 2>/dev/null | head -1)
+# libevent's cmake config files embed absolute build paths (non-relocatable).
+# Remove them so folly falls back to find_library() with our explicit hints.
+rm -rf "$SEA_PACKAGES_DIR/libevent/lib/cmake" 2>/dev/null || true
+
+# Find sea's libevent library
+LIBEVENT_LIB=$(find "$SEA_PACKAGES_DIR/libevent/lib" \
+    -name "libevent-2*.dylib" -o -name "libevent-2*.so*" \
+    -o -name "libevent_core.lib" -o -name "libevent.a" \
+    2>/dev/null | head -1)
 LIBEVENT_INC="$SEA_PACKAGES_DIR/libevent/include"
 
 CMAKE_EXTRA=""

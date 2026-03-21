@@ -18,6 +18,6 @@ cmake "$SRCDIR" \
     -DHERMES_BUILD_APPLE_FRAMEWORK=OFF \
     -DHERMES_ENABLE_TEST_SUITE=OFF
 
-cmake --build . --config Release -j
+cmake --build . --config Release -j2
 cmake --install . --config Release
 echo "hermes built"
