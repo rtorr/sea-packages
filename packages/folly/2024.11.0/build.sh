@@ -30,10 +30,10 @@ CMAKE_PLATFORM=""
 if [ "$SEA_OS" = "windows" ] || [ -n "$WINDIR" ]; then
     CMAKE_PLATFORM="-A x64 -DBoost_COMPILER=-vc143"
     # Patch: folly's file(GENERATE) for libfolly.pc breaks with multi-config
-    # generators. Comment out the pkgconfig install to avoid cmake errors.
-    sed -i.bak '/libfolly\.pc/d' "$SRCDIR/CMakeLists.txt"
-    sed -i.bak '/gen_pkgconfig_vars/d' "$SRCDIR/CMakeLists.txt"
-    sed -i.bak '/pkgconfig/d' "$SRCDIR/CMakeLists.txt"
+    # generators (Visual Studio). Comment out the entire pkgconfig block.
+    sed -i.bak 's/gen_pkgconfig_vars(FOLLY_PKGCONFIG folly_deps)/# &/' "$SRCDIR/CMakeLists.txt"
+    sed -i.bak '/Generate a pkg-config file/,/DESTINATION.*pkgconfig/s/^/#/' "$SRCDIR/CMakeLists.txt"
+    sed -i.bak '/^#.*DESTINATION.*pkgconfig/{n;s/^/#/;n;s/^/#/;}' "$SRCDIR/CMakeLists.txt"
 fi
 
 cmake "$SRCDIR" \
