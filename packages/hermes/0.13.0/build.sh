@@ -12,12 +12,18 @@ if ! grep -q '#include <string>' "$SRCDIR/API/hermes/cdp/DomainState.cpp" 2>/dev
     sed -i.bak '1s/^/#include <string>\n/' "$SRCDIR/API/hermes/cdp/DomainState.cpp"
 fi
 
+# Patch: MSVC rejects value-initialization of a union containing a type with an
+# explicit default constructor (CompressedPointer). Fix by giving the union an
+# explicit constructor that initializes the storage member.
+sed -i.bak 's/} ret{};/} ret; ret.storage = 0;/' "$SRCDIR/lib/VM/gcs/HadesGC.cpp"
+
 mkdir -p "$SEA_PROJECT_DIR/_hbuild" && cd "$SEA_PROJECT_DIR/_hbuild"
 
-# On Windows, force Ninja to avoid multi-config Visual Studio generator issues
+# On Windows, use VS generator with -A x64 (handles MSVC setup automatically).
+# Hermes doesn't have the pkgconfig issue that folly has.
 CMAKE_GEN=""
 if [ "$SEA_OS" = "windows" ] || [ -n "$WINDIR" ]; then
-    CMAKE_GEN="-G Ninja"
+    CMAKE_GEN="-A x64"
 fi
 
 cmake "$SRCDIR" \

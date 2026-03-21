@@ -1,0 +1,12 @@
+[package]
+name = "nlohmann-json"
+version = "3.11.2"
+kind = "header-only"
+description = "JSON for Modern C++ — header-only"
+
+[build.source]
+url = "https://github.com/nlohmann/json/archive/refs/tags/v3.11.2.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**"]
