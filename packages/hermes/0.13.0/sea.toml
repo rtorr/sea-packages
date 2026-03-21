@@ -1,0 +1,15 @@
+[package]
+name = "hermes"
+version = "0.13.0"
+kind = "source"
+description = "Hermes JavaScript engine"
+
+[build]
+cmake_args = ["-DHERMES_BUILD_APPLE_FRAMEWORK=OFF", "-DHERMES_ENABLE_TEST_SUITE=OFF", "-DCMAKE_CXX_STANDARD=17"]
+
+[build.source]
+url = "https://github.com/facebook/hermes/archive/refs/tags/v0.13.0.tar.gz"
+
+[publish]
+registry = "sea-packages"
+include = ["include/**", "lib/**", "bin/**", "share/**"]
