@@ -55,9 +55,11 @@ jobs:
 
       - name: Install sea
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Resolve the latest release tag explicitly to avoid CDN caching issues
-          SEA_VERSION=$(curl -sSf https://api.github.com/repos/rtorr/sea/releases/latest | grep '"tag_name"' | head -1 | cut -d'"' -f4)
+          # Resolve the latest release tag using authenticated API to avoid rate limits
+          SEA_VERSION=$(curl -sSf -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/rtorr/sea/releases/latest | grep '"tag_name"' | head -1 | cut -d'"' -f4)
           echo "Installing sea $SEA_VERSION"
           OS=$(uname -s | tr A-Z a-z)
           ARCH=$(uname -m)
