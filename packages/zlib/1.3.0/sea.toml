@@ -6,6 +6,7 @@ description = "A massively spiffy yet delicately unobtrusive compression library
 license = "Zlib"
 
 [build]
+cmake_args = ["-DCMAKE_POSITION_INDEPENDENT_CODE=ON"]
 
 [build.source]
 url = "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"

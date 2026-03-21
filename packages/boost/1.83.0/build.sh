@@ -36,7 +36,7 @@ $B2 \
     --with-system \
     --with-thread \
     variant=release \
-    link=shared \
+    link=static,shared \
     threading=multi \
     runtime-link=shared \
     install \
