@@ -25,10 +25,19 @@ fi
 
 # Pass explicit paths for deps whose cmake Find modules use non-standard variable names.
 # Folly ships its own FindDoubleConversion.cmake which doesn't respect CMAKE_PREFIX_PATH.
+# Debug: show what's in the double-conversion package
+echo "SEA_PACKAGES_DIR=$SEA_PACKAGES_DIR"
+ls -la "$SEA_PACKAGES_DIR/double-conversion/lib/" 2>/dev/null || echo "WARNING: double-conversion lib dir not found"
+
 DC_LIB=$(find "$SEA_PACKAGES_DIR/double-conversion/lib" -name "libdouble-conversion.*" -o -name "double-conversion.lib" 2>/dev/null | head -1)
 DC_INC="$SEA_PACKAGES_DIR/double-conversion/include"
+echo "DC_LIB=$DC_LIB"
+echo "DC_INC=$DC_INC"
 if [ -n "$DC_LIB" ]; then
     CMAKE_EXTRA="$CMAKE_EXTRA -DDOUBLE_CONVERSION_LIBRARY=$DC_LIB -DDOUBLE_CONVERSION_INCLUDE_DIR=$DC_INC"
+    echo "Passing DOUBLE_CONVERSION paths to cmake"
+else
+    echo "WARNING: could not find double-conversion library"
 fi
 
 mkdir -p "$SEA_PROJECT_DIR/_fbuild" && cd "$SEA_PROJECT_DIR/_fbuild"

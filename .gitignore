@@ -6,3 +6,4 @@ sea_packages/
 *.lock
 .sea-linking
 .DS_Store
+build-cache/
