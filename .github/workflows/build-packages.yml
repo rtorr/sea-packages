@@ -94,17 +94,6 @@ jobs:
           printf '[[remotes]]\nname = "sea-packages"\ntype = "github-releases"\nurl = "rtorr/sea-packages"\ntoken_env = "GITHUB_TOKEN"\n' > ~/.sea/config.toml
           cat ~/.sea/config.toml
 
-      - name: Install dependencies
-        if: ${{ hashFiles(format('packages/{0}/sea.toml', matrix.package)) != '' }}
-        working-directory: packages/${{ matrix.package }}
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if grep -q '\[dependencies\]' sea.toml; then
-            sea install || echo "::warning::Dependency install failed"
-          fi
-
       - name: Set up SSL for Git Bash curl (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
