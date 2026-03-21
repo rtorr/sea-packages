@@ -25,10 +25,12 @@ fi
 
 mkdir -p "$SEA_PROJECT_DIR/_fbuild" && cd "$SEA_PROJECT_DIR/_fbuild"
 
-# Windows: use VS generator with MSVC.
+# Windows: use VS generator with MSVC, build static (folly lacks dllexport annotations).
 CMAKE_PLATFORM=""
+BUILD_SHARED="ON"
 if [ "$SEA_OS" = "windows" ] || [ -n "$WINDIR" ]; then
     CMAKE_PLATFORM="-A x64 -DBoost_COMPILER=-vc143"
+    BUILD_SHARED="OFF"
     # Patch: folly's file(GENERATE) for libfolly.pc breaks with multi-config
     # generators (Visual Studio). Comment out the entire pkgconfig block.
     sed -i.bak 's/gen_pkgconfig_vars(FOLLY_PKGCONFIG folly_deps)/# &/' "$SRCDIR/CMakeLists.txt"
@@ -40,7 +42,7 @@ cmake "$SRCDIR" \
     $CMAKE_PLATFORM \
     -DCMAKE_INSTALL_PREFIX="$SEA_INSTALL_DIR" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_SHARED_LIBS=$BUILD_SHARED \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
