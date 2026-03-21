@@ -12,10 +12,10 @@ if ! grep -q '#include <string>' "$SRCDIR/API/hermes/cdp/DomainState.cpp" 2>/dev
     sed -i.bak '1s/^/#include <string>\n/' "$SRCDIR/API/hermes/cdp/DomainState.cpp"
 fi
 
-# Patch: MSVC rejects value-initialization of a union containing a type with an
-# explicit default constructor (CompressedPointer). Fix by giving the union an
-# explicit constructor that initializes the storage member.
-sed -i.bak 's/} ret{};/} ret; ret.storage = 0;/' "$SRCDIR/lib/VM/gcs/HadesGC.cpp"
+# Patch: Modern compilers reject value-initialization of a union containing
+# CompressedPointer (which has an explicit default constructor). Use a
+# portable perl one-liner to replace the multi-line union block.
+perl -i -0pe 's/union \{\s*\n\s*Storage storage;\s*\n\s*T val;\s*\n\s*\} ret\{\};/union U { Storage storage; T val; U() : storage(0) {} } ret;/g' "$SRCDIR/lib/VM/gcs/HadesGC.cpp"
 
 mkdir -p "$SEA_PROJECT_DIR/_hbuild" && cd "$SEA_PROJECT_DIR/_hbuild"
 
