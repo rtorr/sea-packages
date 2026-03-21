@@ -25,10 +25,19 @@ fi
 
 mkdir -p "$SEA_PROJECT_DIR/_fbuild" && cd "$SEA_PROJECT_DIR/_fbuild"
 
+# On Windows, force Ninja generator to avoid multi-config issues with
+# Visual Studio generator (folly's pkg-config generation breaks with it).
+CMAKE_GEN=""
+if [ "$SEA_OS" = "windows" ] || [ -n "$WINDIR" ]; then
+    CMAKE_GEN="-G Ninja"
+fi
+
 cmake "$SRCDIR" \
+    $CMAKE_GEN \
     -DCMAKE_INSTALL_PREFIX="$SEA_INSTALL_DIR" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
     -DCMAKE_CXX_STANDARD=17 \
