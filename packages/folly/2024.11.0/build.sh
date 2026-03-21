@@ -27,7 +27,9 @@ fi
 # Folly ships its own FindDoubleConversion.cmake which doesn't respect CMAKE_PREFIX_PATH.
 # Debug: show what's in the double-conversion package
 echo "SEA_PACKAGES_DIR=$SEA_PACKAGES_DIR"
-ls -la "$SEA_PACKAGES_DIR/double-conversion/lib/" 2>/dev/null || echo "WARNING: double-conversion lib dir not found"
+echo "double-conversion contents:"
+find "$SEA_PACKAGES_DIR/double-conversion" -type f 2>/dev/null | head -20
+echo "---"
 
 DC_LIB=$(find "$SEA_PACKAGES_DIR/double-conversion/lib" -name "libdouble-conversion.*" -o -name "double-conversion.lib" 2>/dev/null | head -1)
 DC_INC="$SEA_PACKAGES_DIR/double-conversion/include"
